@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-7">
+        <h3>{{ heading }}</h3>
+        <form method="post">
+            {{ form.hidden_tag() }}
+            {% for field in [form.title, form.description, form.category, form.date, form.time, form.venue,
+            form.capacity] %}
+            <div class="mb-3">
+                {{ field.label(class="form-label") }}
+                {% if field.type == 'SelectField' %}
+                {{ field(class="form-select") }}
+                {% else %}
+                {{ field(class="form-control") }}
+                {% endif %}
+                {% for error in field.errors %}
+                <div class="text-danger small">{{ error }}</div>
+                {% endfor %}
+            </div>
+            {% endfor %}
+            {{ form.submit(class="btn btn-primary") }}
+            <a href="{{ url_for('home') }}" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

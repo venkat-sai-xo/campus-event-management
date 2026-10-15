@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2 class="mb-4">Admin Dashboard</h2>
+
+<div class="row mb-4">
+    <div class="col-md-3 mb-3">
+        <div class="card text-bg-primary h-100">
+            <div class="card-body">
+                <h6 class="card-title">Total Events</h6>
+                <h2>{{ stats.events }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card text-bg-success h-100">
+            <div class="card-body">
+                <h6 class="card-title">Upcoming Events</h6>
+                <h2>{{ stats.upcoming }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card text-bg-info h-100">
+            <div class="card-body">
+                <h6 class="card-title">Students</h6>
+                <h2>{{ stats.students }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card text-bg-warning h-100">
+            <div class="card-body">
+                <h6 class="card-title">Registrations</h6>
+                <h2>{{ stats.registrations }}</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <h5>Most Popular Events</h5>
+        {% if top_events %}
+        <table class="table table-bordered align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Event</th>
+                    <th>Registered</th>
+                    <th>Capacity</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for event, count in top_events %}
+                <tr>
+                    <td><a href="{{ url_for('event_registrations', event_id=event.id) }}">{{ event.title }}</a></td>
+                    <td>{{ count }}</td>
+                    <td>{{ event.capacity }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p class="text-muted">No events yet.</p>
+        {% endif %}
+    </div>
+
+    <div class="col-md-6 mb-4">
+        <h5>Recent Registrations</h5>
+        {% if recent %}
+        <table class="table table-bordered align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Student</th>
+                    <th>Event</th>
+                    <th>When</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in recent %}
+                <tr>
+                    <td>{{ r.student.name }}</td>
+                    <td>{{ r.event.title }}</td>
+                    <td>{{ r.registered_at.strftime('%d %b, %I:%M %p') }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p class="text-muted">No registrations yet.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block content %}
+<a href="{{ url_for('home') }}" class="btn btn-sm btn-outline-secondary mb-3">&larr; Back to events</a>
+
+<h2>{{ event.title }}</h2>
+<span class="badge bg-info mb-3">{{ event.category }}</span>
+
+<p>{{ event.description }}</p>
+
+<ul class="list-unstyled">
+    <li><b>Date:</b> {{ event.date.strftime('%d %b %Y') }}</li>
+    <li><b>Time:</b> {{ event.time.strftime('%I:%M %p') }}</li>
+    <li><b>Venue:</b> {{ event.venue }}</li>
+    <li><b>Capacity:</b> {{ event.capacity }}</li>
+    <li><b>Seats left:</b> {{ event.seats_left() }}</li>
+</ul>
+
+{% if current_user.is_authenticated and current_user.is_admin %}
+<div class="d-flex gap-2 mt-3 flex-wrap">
+    <a href="{{ url_for('event_registrations', event_id=event.id) }}" class="btn btn-primary">
+        Registrations ({{ event.registrations|length }})
+    </a>
+    <a href="{{ url_for('edit_event', event_id=event.id) }}" class="btn btn-warning">Edit Event</a>
+    <form method="post" action="{{ url_for('delete_event', event_id=event.id) }}"
+        onsubmit="return confirm('Delete this event? This cannot be undone.');">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button class="btn btn-danger">Delete Event</button>
+    </form>
+</div>
+
+{% elif current_user.is_authenticated %}
+{% if is_registered %}
+<div class="alert alert-success">You are registered for this event.</div>
+<form method="post" action="{{ url_for('cancel_registration', event_id=event.id) }}"
+    onsubmit="return confirm('Cancel your registration?');">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <button class="btn btn-outline-danger">Cancel Registration</button>
+</form>
+{% elif is_past %}
+<div class="alert alert-secondary">This event is already over.</div>
+{% elif event.seats_left() <= 0 %} <div class="alert alert-danger">This event is full.</div>
+    {% else %}
+    <form method="post" action="{{ url_for('register_event', event_id=event.id) }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button class="btn btn-success">Register for this Event</button>
+    </form>
+    {% endif %}
+
+    {% else %}
+    <a href="{{ url_for('login', next=request.path) }}" class="btn btn-primary">Login to Register</a>
+    {% endif %}
+    {% endblock %}
